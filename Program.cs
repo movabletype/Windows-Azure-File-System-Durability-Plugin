@@ -54,14 +54,33 @@ namespace FileSystemDurabilityPlugin
                         accountKey = RoleEnvironment.GetConfigurationSettingValue("FileSystemDurabilityPlugin.StorageAccountPrimaryKey");
                         containerName = RoleEnvironment.GetConfigurationSettingValue("FileSystemDurabilityPlugin.SyncContainerName");
 
-                        // FileSystemDurabilityPlugin.LocalFolderToSync must be relative to web site root or approot
-
-                        // Check if sitesroot\0 exists. We only synchronize the firt web site
-                        string appRootDir = Environment.GetEnvironmentVariable("RoleRoot") + @"\sitesroot\0";
-                        if (!Directory.Exists(appRootDir))
+                        // Should use LocalFolderToSync as local sync path if it begins with root dir.
+                        string appRootDir = RoleEnvironment.GetConfigurationSettingValue("FileSystemDurabilityPlugin.LocalFolderToSync");
+                        if (Path.IsPathRooted(appRootDir))
                         {
-                            // May be WorkerRole
-                            appRootDir = Environment.GetEnvironmentVariable("RoleRoot") + @"\approot";
+                            if (!Directory.Exists(appRootDir))
+                            {
+                                try
+                                {
+                                    Directory.CreateDirectory(appRootDir);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Trace.TraceError("Failed to create directory {0}. Error: {1}", appRootDir, ex.Message);
+                                    Environment.Exit(-1);
+                                }
+                            }
+
+                        }
+                        else
+                        {
+                            // Check if sitesroot\0 exists. We only synchronize the firt web site
+                            appRootDir = Environment.GetEnvironmentVariable("RoleRoot") + @"\sitesroot\0";
+                            if (!Directory.Exists(appRootDir))
+                            {
+                                // May be WorkerRole
+                                appRootDir = Environment.GetEnvironmentVariable("RoleRoot") + @"\approot";
+                            }
                         }
 
                         try
@@ -83,7 +102,7 @@ namespace FileSystemDurabilityPlugin
                         }
 
                         // Set sync folder on local VM
-                        localPathName = Path.Combine(appRootDir, RoleEnvironment.GetConfigurationSettingValue("FileSystemDurabilityPlugin.LocalFolderToSync"));
+                        localPathName = appRootDir;
 
                         fileNameIncludesToSync = RoleEnvironment.GetConfigurationSettingValue("FileSystemDurabilityPlugin.FileNameIncludesToSync");
                         excludePaths = RoleEnvironment.GetConfigurationSettingValue("FileSystemDurabilityPlugin.ExcludePathsFromSync");
