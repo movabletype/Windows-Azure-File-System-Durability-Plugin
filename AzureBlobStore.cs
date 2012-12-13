@@ -153,6 +153,7 @@ namespace FileSystemDurabilityPlugin
             string relativePath = "";
             FileAttributes fileAttributes = 0;
             string tempFileName = Path.GetTempFileName();
+            name = name.Replace(@"\", "/");
             CloudBlob blob = Container.GetBlobReference(name);
             BlobProperties props = blob.Properties;
 
@@ -252,7 +253,9 @@ namespace FileSystemDurabilityPlugin
                 throw new ApplicationException("Name Too Long");
             }
 
-            CloudBlob blob = Container.GetBlobReference(fileData.RelativePath.ToLower());
+            string path = fileData.RelativePath.ToLower();
+            path = path.Replace(@"\", "/");
+            CloudBlob blob = Container.GetBlobReference(path);
             BlobProperties blobProperties = blob.Properties;
             DateTime uninitTime = blobProperties.LastModifiedUtc;
             SetupMetadata(blob.Metadata, fileData, relativePath);
@@ -297,6 +300,7 @@ namespace FileSystemDurabilityPlugin
             DateTime expectedLastModified
             )
         {
+            oldName = oldName.Replace(@"\", "/");
             CloudBlob blob = Container.GetBlobReference(oldName);
             try
             {
@@ -355,6 +359,7 @@ namespace FileSystemDurabilityPlugin
             DateTime expectedLastModified
             )
         {
+            name = name.Replace(@"\", "/");
             CloudBlob blob = Container.GetBlobReference(name);
             try
             {

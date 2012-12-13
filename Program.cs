@@ -48,7 +48,7 @@ namespace FileSystemDurabilityPlugin
                     {
                         // Store main thread handle
                         WindowsAzureBlob2FileSystemSync._mainThread = Thread.CurrentThread;
-                        
+
                         // Read configuration settings
                         accountName = RoleEnvironment.GetConfigurationSettingValue("FileSystemDurabilityPlugin.StorageAccountName");
                         accountKey = RoleEnvironment.GetConfigurationSettingValue("FileSystemDurabilityPlugin.StorageAccountPrimaryKey");
@@ -56,6 +56,7 @@ namespace FileSystemDurabilityPlugin
 
                         // Should use LocalFolderToSync as local sync path if it begins with root dir.
                         string appRootDir = RoleEnvironment.GetConfigurationSettingValue("FileSystemDurabilityPlugin.LocalFolderToSync");
+                        
                         if (Path.IsPathRooted(appRootDir))
                         {
                             if (!Directory.Exists(appRootDir))
@@ -86,7 +87,7 @@ namespace FileSystemDurabilityPlugin
                         try
                         {
                             // Make appRootDir writable. 
-                            DirectorySecurity sec = Directory.GetAccessControl(appRootDir);                           
+                            DirectorySecurity sec = Directory.GetAccessControl(appRootDir);
                             SecurityIdentifier everyone = new SecurityIdentifier(WellKnownSidType.WorldSid, null);
                             sec.AddAccessRule(new FileSystemAccessRule(everyone,
                                 FileSystemRights.Modify | FileSystemRights.Synchronize,
@@ -234,7 +235,7 @@ namespace FileSystemDurabilityPlugin
                             }
                             catch (ThreadInterruptedException)
                             {
-                                Trace.TraceInformation("File Synchronization thread interrupted. Configuration settings might have changed.");                                
+                                Trace.TraceInformation("File Synchronization thread interrupted. Configuration settings might have changed.");
                             }
                         }
                     }
