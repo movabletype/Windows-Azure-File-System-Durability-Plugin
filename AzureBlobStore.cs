@@ -83,7 +83,7 @@ namespace FileSystemDurabilityPlugin
                     blobContainer.GetBlobReference("__testblob").Delete();
 
                     var permissions = blobContainer.GetPermissions();
-                    permissions.PublicAccess = BlobContainerPublicAccessType.Container;
+                    permissions.PublicAccess = BlobContainerPublicAccessType.Off;
                     blobContainer.SetPermissions(permissions);
 
                     break;
